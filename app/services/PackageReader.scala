@@ -1,9 +1,10 @@
 package services
 
-import java.io.{BufferedInputStream, ByteArrayOutputStream, InputStream, Closeable}
+import java.io._
 import java.net.URI
 import java.util.Properties
 
+import com.migcomponents.migbase64.Base64IO
 import models.PackageDescription
 import org.apache.commons.compress.archivers.ArchiveStreamFactory
 
@@ -43,7 +44,7 @@ object PackageReader {
 
   def base64Encode (stream: InputStream): String = {
     val buffer = new ByteArrayOutputStream()
-    new sun.misc.BASE64Encoder().encode(stream, buffer)
+    Base64IO.encode(new BufferedInputStream(stream), buffer, false)
     buffer.toString
   }
 
