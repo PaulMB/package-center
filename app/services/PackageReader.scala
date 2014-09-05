@@ -1,6 +1,6 @@
 package services
 
-import java.io.{ByteArrayOutputStream, InputStream, Closeable}
+import java.io.{BufferedInputStream, ByteArrayOutputStream, InputStream, Closeable}
 import java.net.URI
 import java.util.Properties
 
@@ -24,7 +24,7 @@ object PackageReader {
     import scala.collection.JavaConverters._
 
     val properties: Properties = new Properties()
-    withCloseable(new ArchiveStreamFactory().createArchiveInputStream(uri.toURL.openStream())) { archiveStream =>
+    withCloseable(new ArchiveStreamFactory().createArchiveInputStream(new BufferedInputStream(uri.toURL.openStream()))) { archiveStream =>
       Stream.continually(archiveStream.getNextEntry).takeWhile(_ != null).foreach(entry =>
         entry.getName match {
           case "INFO" => properties.load(archiveStream)

@@ -31,9 +31,7 @@ class Packages @Inject() (packageService: PackageService) extends Controller {
       val body: Map[String, String] = request.body.mapValues( l => l.head)
       val list: Future[List[PackageDescription]] = packageService.findMatching(body.get("major") + "." + body.get("minor") + "-" + body.get("build"), body.get("arch").get)
       list.map { packages =>
-        Json.arr(packages)
-      }.map { packages =>
-        Ok(packages(0))
+        Ok(new JsArray(packages.map( item => Json.toJson(item)(packageWriter))))
       }
   }
 

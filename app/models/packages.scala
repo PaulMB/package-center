@@ -26,7 +26,7 @@ object PackageDescription {
 
   def fromMap(map: scala.collection.mutable.Map[String, String]): PackageDescription = {
     val properties: scala.collection.Map[String, String] = map.mapValues[String] { value =>
-      value.replace("\"", "")
+      value.replaceAllLiterally("\"", "")
     }
     PackageDescription(
       properties.get("package").get,
@@ -38,7 +38,7 @@ object PackageDescription {
       properties.get("link").get,
       properties.get("md5"),
       properties.get("icon").get,
-      properties.getOrElse("size", "0").toLong,
+      properties.getOrElse("size", "5000000").toLong,
       properties.getOrElse("qinst", "false").toBoolean,
       properties.get("install_dep_services"),
       properties.get("install_dep_packages"),
@@ -75,6 +75,28 @@ object PackageJsonFormats {
       (__ \ "changelog").write[Option[String]] and
       (__ \ "beta").write[Boolean]
     )(unlift(PackageDescription.unapply))
+  /**
+   * Explicit reader with field renaming when returning Json for DSM package center
+   */
+  val packageReader: Reads[PackageDescription] = (
+      (__ \ "package").read[String] and
+      (__ \ "version").read[String] and
+      (__ \ "firmware").read[String] and
+      (__ \ "arch").read[String] and
+      (__ \ "dname").read[String] and
+      (__ \ "desc").read[Option[String]] and
+      (__ \ "link").read[String] and
+      (__ \ "md5").read[Option[String]] and
+      (__ \ "icon").read[String] and
+      (__ \ "size").read[Long] and
+      (__ \ "qinst").read[Boolean] and
+      (__ \ "depsers").read[Option[String]] and
+      (__ \ "deppkgs").read[Option[String]] and
+      (__ \ "start").read[Boolean] and
+      (__ \ "maintainer").read[Option[String]] and
+      (__ \ "changelog").read[Option[String]] and
+      (__ \ "beta").read[Boolean]
+    )(PackageDescription.apply _)
   /*
    * Generates Writes and Reads
    */
